@@ -32,23 +32,41 @@ def conexao():
     return st.connection("postgresql", type="sql")
 
 
+def _sql(nome: str) -> str:
+    with open(os.path.join(RAIZ, "sql", nome), encoding="utf-8") as f:
+        return f.read()
+
+
+def _tabelas_esperadas() -> set[str]:
+    """Le os nomes direto do schema.sql, para nao virar lista desatualizada."""
+    import re
+    return set(re.findall(r"create table if not exists (\w+)", _sql("001_schema.sql")))
+
+
 @st.cache_resource
 def garantir_schema() -> str:
-    """Aplica schema e seed uma vez por processo.
+    """Aplica schema e seed uma vez por processo, e so quando falta algo.
 
     Em hospedagem sem shell (Streamlit Cloud) nao da para rodar psql na
     mao. Os dois arquivos sao idempotentes — tudo `if not exists` e
-    `on conflict do nothing` — entao rodar a cada boot nao faz estrago.
+    `on conflict do nothing` — mas rodar o DDL inteiro custa alguns
+    segundos contra um banco remoto, e isso apareceria na cara do
+    primeiro visitante depois de cada deploy. Entao a gente confere
+    antes e so paga o preco quando ha o que criar.
     """
     conn = conexao()
+    with conn.session as s:
+        existentes = {r[0] for r in s.execute(text(
+            "select table_name from information_schema.tables "
+            "where table_schema = 'public'")).all()}
+    if _tabelas_esperadas() <= existentes:
+        return "ja estava criado"
+
     for nome in ("001_schema.sql", "002_seed.sql"):
-        caminho_sql = os.path.join(RAIZ, "sql", nome)
-        with open(caminho_sql, encoding="utf-8") as f:
-            script = f.read()
         with conn.session as s:
-            s.execute(text(script))
+            s.execute(text(_sql(nome)))
             s.commit()
-    return "ok"
+    return "criado agora"
 
 
 # --------------------------------------------------------------------- leitura
@@ -275,16 +293,22 @@ def adicionar_foto(arquivo: str, legenda: str = "", servico_id: int | None = Non
     return novo is not None
 
 
-def materializar_fotos() -> int:
+def materializar_fotos(apenas: list[str] | None = None) -> int:
     """Repoe no disco as fotos que so existem no banco.
 
     O Streamlit serve as imagens de `static/`, mas esse diretorio nao
     sobrevive a um redeploy. Aqui o banco reescreve o que faltar, e o
     disco passa a ser so um cache.
+
+    `apenas` limita aos arquivos que a tela vai mostrar. Sem isso, o
+    primeiro visitante depois de um deploy espera o download da galeria
+    inteira; com isso, espera so o que vai ver.
     """
-    faltando = [f for f in listar_portfolio(incluir_inativos=True)
-                if not portfolio.existe(f["arquivo"])
-                or not portfolio.caminho_thumb(f["arquivo"]).is_file()]
+    candidatos = (apenas if apenas is not None
+                  else [f["arquivo"] for f in listar_portfolio(incluir_inativos=True)])
+    faltando = [{"arquivo": a} for a in candidatos
+                if not portfolio.existe(a)
+                or not portfolio.caminho_thumb(a).is_file()]
     if not faltando:
         return 0
 

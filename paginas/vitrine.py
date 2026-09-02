@@ -126,9 +126,9 @@ def _portfolio() -> None:
     fotos = db.listar_portfolio(limite=12)
     if not fotos:
         return
-    # Em hospedagem com disco efemero a pasta static/ some no deploy;
-    # o banco repoe o que faltar antes de a grade pedir as imagens.
-    db.materializar_fotos()
+    # Em hospedagem com disco efemero a pasta static/ some no deploy; o
+    # banco repoe as fotos desta pagina antes de a grade pedir as imagens.
+    db.materializar_fotos([f["arquivo"] for f in fotos])
     ui.secao("Portfólio", "Trabalhos que saíram daqui")
     st.caption("Toque numa foto para ver em tamanho grande.")
     grade = ui.galeria_html(fotos)

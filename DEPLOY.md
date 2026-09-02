@@ -28,23 +28,24 @@ código muda, só o lugar onde roda.
 
 ---
 
-## 1. Criar o banco (5 min)
+## 1. O banco — já está pronto
 
-Qualquer Postgres 14+ com internet serve. O mais rápido é o
-[Neon](https://neon.tech) no plano grátis:
+Projeto Neon `polished-rice-69091972`, branch `production`, PostgreSQL 18
+em `us-east-2`, plano grátis. Já foi tudo aplicado e conferido contra ele:
 
-1. Crie um projeto, região **AWS São Paulo (sa-east-1)** se disponível.
-2. Copie a *connection string*. Ela tem esta cara:
+- as 8 tabelas e o catálogo (3 serviços, 3 portes, 14 itens, 7 dias);
+- as 27 fotos do portfólio, com legenda e ordem (6,7 MB);
+- a constraint `EXCLUDE` de overbooking, testada com duas reservas
+  simultâneas no mesmo box — a segunda foi recusada pelo banco.
 
-```
-postgresql://usuario:senha@ep-algo-123.sa-east-1.aws.neon.tech/neondb?sslmode=require
-```
+A connection string fica no console, em **Connect**. Prefira a versão
+*pooled* (o host tem `-pooler` no nome), que é a adequada para o
+Streamlit, que abre várias sessões.
 
-O app cria as tabelas e o catálogo sozinho no primeiro acesso — schema e
-seed são idempotentes e rodam a cada boot sem estragar nada. Não precisa
-rodar `psql`.
-
-> Supabase, Railway e Render também servem. Só evite banco sem SSL.
+> Se um dia trocar de banco: o app cria schema e catálogo sozinho no
+> primeiro acesso. Ele confere quais tabelas existem e só roda o DDL
+> quando falta alguma, então isso não custa nada nos boots seguintes.
+> Qualquer Postgres 14+ com SSL serve.
 
 ## 2. Subir o app (3 min)
 
@@ -55,6 +56,10 @@ rodar `psql`.
 3. Em **Advanced settings**, escolha **Python 3.12** e cole os secrets
    (o conteúdo abaixo, com seus valores).
 4. **Deploy**.
+
+> No plano gratis o Neon suspende o compute depois de alguns minutos sem
+> consulta. A primeira visita depois disso paga uns 4s a mais para acordar
+> o banco; as seguintes respondem em meio segundo.
 
 ## 3. Secrets
 
