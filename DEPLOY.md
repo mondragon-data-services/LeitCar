@@ -1,8 +1,7 @@
 # Publicar no Streamlit Community Cloud
 
-O app está pronto para subir. Falta **uma coisa que só você pode fazer**:
-criar um Postgres na nuvem. O Streamlit Cloud roda o Python, mas não
-oferece banco de dados.
+O app e o banco estao prontos. Falta so apontar um para o outro: o
+Streamlit Cloud roda o Python, o Neon guarda os dados.
 
 ---
 
@@ -96,16 +95,14 @@ Depois do primeiro deploy você descobre a URL do app. Volte nos secrets e
 corrija `url_publica` — é ela que vai no link do comprovante que o cliente
 recebe no WhatsApp.
 
-## 4. Carregar as fotos (1 min)
+## 4. As fotos ja estao la
 
-O banco novo nasce sem galeria. As 27 fotos originais estão versionadas em
-`fotos/`, então:
+As 27 fotos foram importadas para o Neon com legenda e ordem, entao a
+galeria aparece assim que o app sobe.
 
-1. Abra `https://SEU-APP.streamlit.app/?area=admin` e entre com a senha.
-2. **Portfólio** → **Importar tudo da pasta `fotos/`**.
-3. Ajuste legendas e ordem se quiser.
-
-Dali em diante o upload pelo admin é o caminho normal.
+Para subir mais: `?area=admin` -> **Portfolio** -> *Enviar fotos*. Se um
+dia precisar recomecar do zero, os originais estao versionados em
+`fotos/` e o botao *Importar tudo da pasta* reconstroi a galeria.
 
 ---
 
