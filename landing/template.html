@@ -1,0 +1,114 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{nome} — Estética automotiva em {cidade}</title>
+<meta name="description" content="{descricao_seo}">
+<link rel="canonical" href="{url_site}">
+<meta property="og:type" content="website">
+<meta property="og:title" content="{nome} — Estética automotiva em {cidade}">
+<meta property="og:description" content="{descricao_seo}">
+<style>
+  :root {{ --tinta:#0b1220; --grafite:#1c2536; --azul:#1d4ed8; --claro:#3b82f6;
+           --cinza:#5b6478; --linha:#e6e8ef; --areia:#f6f7fa; }}
+  * {{ box-sizing:border-box; }}
+  body {{ margin:0; color:var(--tinta); background:#fff;
+         font:16px/1.6 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif; }}
+  .wrap {{ max-width:46rem; margin:0 auto; padding:0 1.2rem; }}
+  header {{ color:#fff; padding:4rem 1.2rem 3.4rem; text-align:center;
+           background:
+             radial-gradient(120% 140% at 80% 0%, rgba(59,130,246,.42) 0%, transparent 55%),
+             linear-gradient(135deg,#0b1220 0%,#1c2536 55%,#142046 100%); }}
+  header .tag {{ font-size:.7rem; letter-spacing:.2em; text-transform:uppercase;
+                color:#93c5fd; font-weight:700; }}
+  header h1 {{ margin:.5rem 0 .4rem; font-size:2.15rem; letter-spacing:-.03em; }}
+  header p {{ margin:0 auto; max-width:34ch; color:#c7d2e5; }}
+  .cta {{ display:inline-block; margin-top:1.6rem; background:#fff; color:var(--azul);
+         font-weight:700; padding:.9rem 2rem; border-radius:999px;
+         text-decoration:none; box-shadow:0 10px 30px -12px rgba(0,0,0,.5); }}
+  .rotulo {{ font-size:.7rem; letter-spacing:.16em; text-transform:uppercase;
+            color:var(--cinza); font-weight:700; margin:2.8rem 0 .1rem; }}
+  h2 {{ font-size:1.35rem; letter-spacing:-.02em; margin:.1rem 0 1rem; }}
+  .servico {{ border:1px solid var(--linha); border-radius:14px; padding:1.1rem 1.2rem;
+             margin-bottom:.8rem; }}
+  .servico .topo {{ display:flex; justify-content:space-between; gap:1rem;
+                   align-items:baseline; flex-wrap:wrap; }}
+  .servico h3 {{ margin:0; font-size:1.05rem; }}
+  .servico .preco {{ font-weight:800; font-size:1.3rem; letter-spacing:-.03em;
+                    white-space:nowrap; }}
+  .servico .preco small {{ display:block; font-size:.7rem; font-weight:600;
+                          color:var(--cinza); letter-spacing:0; text-align:right; }}
+  .servico ul {{ margin:.7rem 0 0; padding-left:1.1rem; color:#3d4658; font-size:.9rem; }}
+  .servico li {{ margin:.15rem 0; }}
+  table {{ width:100%; border-collapse:collapse; font-size:.92rem; }}
+  th, td {{ text-align:left; padding:.6rem .5rem; border-bottom:1px solid var(--linha); }}
+  th {{ font-size:.72rem; letter-spacing:.1em; text-transform:uppercase;
+       color:var(--cinza); }}
+  td.num {{ text-align:right; white-space:nowrap; font-weight:700; }}
+  .galeria {{ display:grid; gap:.6rem;
+             grid-template-columns:repeat(auto-fill,minmax(160px,1fr)); }}
+  .galeria figure {{ margin:0; cursor:zoom-in; position:relative; aspect-ratio:4/3; overflow:hidden;
+                    border-radius:12px; border:1px solid var(--linha);
+                    background:var(--areia); }}
+  .galeria img {{ width:100%; height:100%; object-fit:cover; display:block;
+                 transition:transform .45s ease; }}
+  .galeria figure:hover img {{ transform:scale(1.06); }}
+  .galeria a {{ display:block; width:100%; height:100%; }}
+  .galeria figcaption {{ position:absolute; left:0; right:0; bottom:0; color:#fff;
+        font-size:.72rem; padding:1.4rem .6rem .45rem;
+        background:linear-gradient(to top,rgba(6,10,20,.82),transparent); }}
+  .nota {{ color:var(--cinza); font-size:.82rem; }}
+  footer {{ margin:3rem 0 4rem; padding-top:1.2rem; border-top:1px solid var(--linha);
+           color:var(--cinza); font-size:.85rem; }}
+  a {{ color:var(--azul); }}
+  .centro {{ text-align:center; margin:2.5rem 0; }}
+  .centro .cta {{ background:var(--azul); color:#fff; }}
+</style>
+<script type="application/ld+json">{json_ld}</script>
+</head>
+<body>
+<header>
+  <div class="tag">{cidade}</div>
+  <h1>{nome}</h1>
+  <p>{chamada}</p>
+  <a class="cta" href="{url_app}">Agendar agora</a>
+</header>
+
+<div class="wrap">
+  <div class="rotulo">Tabela de preços</div>
+  <h2>Serviços</h2>
+{blocos_servicos}
+
+  <div class="rotulo">Porte do veículo</div>
+  <h2>Quanto fica para o seu carro</h2>
+  <table>
+    <thead><tr><th>Serviço</th>{cabecalho_portes}</tr></thead>
+    <tbody>
+{linhas_matriz}
+    </tbody>
+  </table>
+  <p class="nota">Os preços da tabela acima são para carro de passeio; SUV e
+     caminhonete têm acréscimo.</p>
+
+{secao_galeria}
+
+  <div class="rotulo">Atendimento</div>
+  <h2>Horário de funcionamento</h2>
+  <table>
+    <tbody>
+{linhas_horarios}
+    </tbody>
+  </table>
+
+  <div class="centro"><a class="cta" href="{url_app}">Agendar agora</a></div>
+
+  <footer>
+    <b>{nome}</b><br>
+    {endereco}<br>
+    WhatsApp: <a href="https://wa.me/{telefone_wa}">{telefone}</a><br>
+    <span class="nota">Página gerada em {gerado_em} a partir do catálogo do sistema.</span>
+  </footer>
+</div>
+</body>
+</html>

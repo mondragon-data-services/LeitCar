@@ -1,0 +1,44 @@
+# Ambiente local de teste. Em producao o alvo e uma VM Always Free da
+# Oracle Cloud em Sao Paulo, com systemd e Nginx (ver deploy/).
+services:
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: lavacar
+      POSTGRES_PASSWORD: lavacar
+      POSTGRES_DB: lavacar
+      TZ: America/Sao_Paulo
+      PGTZ: America/Sao_Paulo
+    ports: ["5432:5432"]
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      - ./sql:/docker-entrypoint-initdb.d:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U lavacar -d lavacar"]
+      interval: 3s
+      timeout: 3s
+      retries: 20
+
+  app:
+    build: .
+    environment:
+      DATABASE_URL: postgresql://lavacar:lavacar@db:5432/lavacar
+      TZ: America/Sao_Paulo
+      URL_SITE: http://localhost:8080
+      # Em producao isso fica false (ver .streamlit/config.toml).
+      STREAMLIT_CLIENT_SHOW_ERROR_DETAILS: "true"
+    ports: ["8501:8501"]
+    volumes:
+      - .:/app
+    depends_on:
+      db: {condition: service_healthy}
+
+  landing:
+    image: nginx:alpine
+    ports: ["8080:80"]
+    volumes:
+      - ./landing/dist:/usr/share/nginx/html:ro
+    depends_on: [app]
+
+volumes:
+  pgdata:

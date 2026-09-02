@@ -1,0 +1,7 @@
+# crontab -e do usuario lavacar
+
+# Landing do SEO regerada todo dia as 4h: preco mudou no admin, a pagina acompanha.
+0 4 * * * cd /opt/lavacar && .venv/bin/python landing/gerar_landing.py /var/www/landing/index.html
+
+# Backup diario para o Object Storage da propria Oracle (tambem gratis).
+30 3 * * * pg_dump -Fc lavacar > /var/backups/lavacar-$(date +\%F).dump

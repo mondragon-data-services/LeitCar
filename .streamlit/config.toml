@@ -1,0 +1,21 @@
+# Cara de site, nao de dashboard (secao 9 da ARQUITETURA).
+[theme]
+primaryColor = "#1d4ed8"
+backgroundColor = "#ffffff"
+secondaryBackgroundColor = "#f5f7fb"
+textColor = "#0f172a"
+font = "sans serif"
+
+[client]
+toolbarMode = "minimal"
+showErrorDetails = false
+
+[server]
+headless = true
+# Serve static/ em /app/static/ — e assim que as fotos do portfolio
+# chegam ao navegador sem virar base64 dentro do HTML.
+enableStaticServing = true
+enableXsrfProtection = true
+
+[browser]
+gatherUsageStats = false

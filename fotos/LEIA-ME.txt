@@ -1,0 +1,15 @@
+Pasta de deposito das fotos do portfolio.
+
+Largue aqui os arquivos (JPG, PNG, WEBP ou HEIC do iPhone) e importe de
+um dos dois jeitos:
+
+  1. No admin: ?area=admin -> Portfolio -> "Importar tudo da pasta fotos/"
+  2. Por linha de comando:
+     docker compose exec app python -c "from servicos import portfolio, db; \
+       [db.adicionar_foto(a) for a, _ in portfolio.importar_pasta()]"
+
+A importacao e idempotente: o nome final do arquivo vem do hash do
+conteudo, entao rodar duas vezes nao duplica nada na galeria.
+
+Os arquivos originais ficam aqui; as versoes tratadas (orientacao do EXIF
+corrigida, redimensionadas e recomprimidas) vao para midia/portfolio/.

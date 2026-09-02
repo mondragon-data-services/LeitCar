@@ -1,0 +1,11 @@
+# O entrypoint roda dentro de um container Linux: CRLF quebraria o shebang.
+*.sh            text eol=lf
+deploy/*        text eol=lf
+Dockerfile      text eol=lf
+*.py            text eol=lf
+*.sql           text eol=lf
+*.toml          text eol=lf
+*.yml           text eol=lf
+*.jpeg          binary
+*.jpg           binary
+*.png           binary

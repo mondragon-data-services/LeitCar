@@ -1,0 +1,7 @@
+streamlit>=1.44,<2
+SQLAlchemy>=2.0,<3
+psycopg2-binary>=2.9
+pandas>=2.2
+qrcode[pil]>=7.4
+pillow-heif>=0.16
+tzdata

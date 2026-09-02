@@ -1,0 +1,9 @@
+.streamlit/secrets.toml
+landing/dist/
+__pycache__/
+*.pyc
+.pytest_cache/
+.venv/
+static/portfolio/
+_diag.py
+static/_*.png
