@@ -247,6 +247,35 @@ def agendamentos_do_dia(d: date) -> list[dict]:
     return df.to_dict("records")
 
 
+def resumo_periodo(inicio: date, fim: date) -> list[dict]:
+    """Um registro por agendamento do periodo, para o acompanhamento.
+
+    Devolve cru de proposito: agrupar por dia ou por semana e contar e
+    trabalho de tela, e assim a mesma consulta serve aos dois.
+    """
+    ini = datetime.combine(inicio, time(0, 0), tzinfo=TZ)
+    termino = datetime.combine(fim, time(0, 0), tzinfo=TZ) + timedelta(days=1)
+    df = conexao().query(
+        """
+        select a.codigo, a.status, a.total_centavos, a.porte_codigo,
+               lower(a.periodo) as inicio,
+               coalesce(
+                 (select string_agg(i.nome_snapshot, ' + ' order by i.id)
+                  from agendamento_itens i
+                  where i.agendamento_id = a.id and i.servico_id is not null),
+                 'sem itens') as servicos
+        from agendamentos a
+        where a.periodo && tstzrange(:ini, :fim, '[)')
+        order by lower(a.periodo)
+        """,
+        params={"ini": ini, "fim": termino}, ttl=60,
+    )
+    linhas = df.to_dict("records")
+    for r in linhas:
+        r["inicio"] = r["inicio"].astimezone(TZ)
+    return linhas
+
+
 # -------------------------------------------------------------------- portfolio
 
 def listar_portfolio(incluir_inativos: bool = False, limite: int | None = None) -> list[dict]:

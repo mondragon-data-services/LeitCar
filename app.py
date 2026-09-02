@@ -12,7 +12,8 @@ st.set_page_config(page_title="Leite Estética Automotiva", page_icon="🚿",
                    layout="centered", initial_sidebar_state="collapsed")
 
 from paginas import (admin_agenda, admin_horarios, admin_portfolio,  # noqa: E402
-                     admin_servicos, agendar, comprovante, ui, vitrine)
+                     admin_resumo, admin_servicos, agendar, comprovante, ui,
+                     vitrine)
 from servicos import db, loja  # noqa: E402
 
 
@@ -55,16 +56,30 @@ def main() -> None:
         comprovante.render(codigo)
         st.stop()
 
+    # Pedir o admin explicitamente cancela o "ver o site".
     if st.query_params.get("area") == "admin":
+        st.session_state.pop("ver_site", None)
+
+    # O st.navigation troca o caminho da URL e nao leva os query params
+    # junto, entao clicar numa aba do admin chegava aqui sem `area=admin`
+    # e caia na vitrine do cliente. Quem manda e a sessao: uma vez
+    # autenticado, o dono continua no admin ate pedir o contrario.
+    no_admin = (st.query_params.get("area") == "admin" or autenticado())
+    if no_admin and not st.session_state.get("ver_site"):
         if not autenticado():
             tela_login()
             st.stop()
+        # Repoe o parametro para o admin sobreviver a um F5.
+        if st.query_params.get("area") != "admin":
+            st.query_params["area"] = "admin"
         # url_path explicito: as paginas do admin expoem um callable chamado
         # `render`, e sem isso o st.navigation infere o mesmo pathname
         # para todas e recusa a lista.
         pg = st.navigation([
             st.Page(admin_agenda.render, title="Agenda", icon="📅",
                     url_path="agenda", default=True),
+            st.Page(admin_resumo.render, title="Acompanhamento", icon="📈",
+                    url_path="acompanhamento"),
             st.Page(admin_servicos.render, title="Serviços", icon="🧽",
                     url_path="servicos"),
             st.Page(admin_horarios.render, title="Horários", icon="🕗",
@@ -74,8 +89,13 @@ def main() -> None:
         ])
         with st.sidebar:
             st.caption("Leite Estética · admin")
+            if st.button("Ver o site", width="stretch",
+                         help="Abre a vitrine do cliente sem perder o login"):
+                st.session_state.ver_site = True
+                st.query_params.clear()
+                st.rerun()
             if st.button("Sair", width="stretch"):
-                st.session_state.admin_ok = False
+                st.session_state.clear()
                 st.query_params.clear()
                 st.rerun()
         pg.run()
@@ -86,6 +106,12 @@ def main() -> None:
         st.stop()
 
     vitrine.render()
+
+    # O dono que veio espiar a vitrine tem como voltar sem novo login.
+    if autenticado() and st.session_state.get("ver_site"):
+        if st.button("← Voltar ao painel do dono"):
+            st.session_state.pop("ver_site", None)
+            ui.ir_para(area="admin")
 
 
 main()
